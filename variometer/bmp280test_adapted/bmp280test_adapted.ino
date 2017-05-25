@@ -29,6 +29,10 @@ Adafruit_BMP280 bmp; // I2C
 //Adafruit_BMP280 bmp(BMP_CS); // hardware SPI
 //Adafruit_BMP280 bmp(BMP_CS, BMP_MOSI, BMP_MISO,  BMP_SCK);
 
+double groundLevel;
+double values[20];
+int counter;
+
 void setup() {
   Wire.begin(4, 5);
   Serial.begin(9600);
@@ -38,10 +42,13 @@ void setup() {
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
     while (1);
   }
+  groundLevel = bmp.readPressure() / 100;
+  counter = 0;
+  
 }
 
 void loop() {
-    Serial.print(F("Temperature = "));
+    /*Serial.print(F("Temperature = "));
     Serial.print(bmp.readTemperature());
     Serial.println(" *C");
     
@@ -50,9 +57,17 @@ void loop() {
     Serial.println(" Pa");
 
     Serial.print(F("Approx altitude = "));
-    Serial.print(bmp.readAltitude(1019.25)); // this should be adjusted to your local forcase
-    Serial.println(" m");
-    
-    Serial.println();
-    delay(2000);
+    Serial.print(bmp.readAltitude(groundLevel)); // this should be adjusted to your local forcase
+    Serial.println(" m");*/
+    values[counter] = bmp.readAltitude(groundLevel);
+    counter += 1;
+    counter %= 20;
+    if(counter == 0) {
+    for (int i = 0; i<20; i++) {
+      Serial.print(values[i]);
+      Serial.print(", ");
+    }
+      Serial.println();
+    }
+    delay(100);
 }
